@@ -14,6 +14,7 @@ const createPost = async (req, res) => {
         .status(404)
         .send({ Message: 'User not found', status: false, data: {} })
     }
+    console.log("req",req.body);
     const { filename } = req.file;
     const newPost = await Post.create({
       user: userId,
