@@ -9,7 +9,7 @@ const createPost = async (req, res) => {
     // Check if the user exists
     const user = await User.findById(userId)
     if (!user) {
-       return res.status(404).send({ Message: 'Post not found',status:false,data:{} })
+      return res.status(404).send({ Message: 'User not found',status:false,data:{} })
     }
 
     const newPost = await Post.create({
@@ -21,11 +21,11 @@ const createPost = async (req, res) => {
       friendTags,
     })
 
-    res
+    return res
       .status(201)
       .send({ message: 'post details', status: true, data: newPost })
   } catch (err) {
-    res.status(400).send({ error: err.message, status: false })
+   return res.status(400).send({ error: err.message, status: false })
   }
 }
 
@@ -37,11 +37,11 @@ const getPostById = async (req, res) => {
       select: '_id name username email_id user_name user_id',
     })
     if (!post) {
-      return res.status(404).send({ error: 'Post not found' })
+      return res.status(404).send({ Message: 'Post not found',status:false,data:{} })
     }
-    res.send({ message: 'post details', status: true, data: post })
+    return res.status(200).send({ message: 'post details', status: true, data: post })
   } catch (err) {
-    res.status(500).send({ error: err.message })
+    return res.status(500).send({ error: err.message })
   }
 }
 
@@ -52,7 +52,7 @@ const updatePostById = async (req, res) => {
     // Check if the user exists
     const user = await User.findById(userId)
     if (!user) {
-      return res.status(404).send({ error: 'User not found' })
+      return res.status(404).send({ Message: 'User not found' ,status:false,data:{}})
     }
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,
@@ -68,16 +68,16 @@ const updatePostById = async (req, res) => {
     )
 
     if (!updatedPost) {
-      return res.status(404).send({ error: 'Post not found' })
+      return res.status(404).send({ Message: 'Post not found',status:false,data:{} })
     }
 
-    res.send({
+    return res.status(200).send({
       message: 'Record Updated successfully.',
       status: true,
       data: updatedPost,
     })
   } catch (err) {
-    res.status(500).send({ error: err.message })
+    return res.status(500).send({ error: err.message })
   }
 }
 
@@ -86,11 +86,11 @@ const deletePostById = async (req, res) => {
   try {
     const deletedPost = await Post.findByIdAndDelete(req.params.id)
     if (!deletedPost) {
-      return res.status(404).send({ error: 'Post not found' })
+      return res.status(404).send({ Message: 'Post not found',status:false,data:{} })
     }
     return res.status(204).send({ message: 'Post deleted', status: true })
   } catch (err) {
-    res.status(500).send({ error: err.message })
+    return res.status(500).send({ error: err.message })
   }
 }
 
@@ -102,7 +102,7 @@ const likePost = async (req, res) => {
     // Check if the post exists
     const post = await Post.findById(postId)
     if (!post) {
-      return res.status(404).json({ error: 'Post not found' })
+      return res.status(404).json({ Message: 'Post not found',status:false,data:{} })
     }
 
     // Check if the user already liked the post
@@ -110,15 +110,15 @@ const likePost = async (req, res) => {
       (like) => like.user.toString() === userId,
     )
     if (alreadyLiked) {
-      return res.status(400).json({ error: 'Post already liked' })
+      return res.status(400).json({ Message: 'Post already liked' })
     }
 
     // Add the user to the post's likes and save
     await Post.findByIdAndUpdate(postId, { $push: { likes: { user: userId } } })
 
-    res.json({ message: 'Post liked successfully', status: true })
+    return res.status(200).send({ message: 'Post liked successfully', status: true })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    return res.status(500).json({ error: err.message })
   }
 }
 
@@ -154,7 +154,7 @@ const getPostFeeds = async (req, res) => {
     // Find the user to check their liked posts
     const currentUser = await User.findById(userId)
     if (!currentUser) {
-      return res.status(404).json({ error: 'User not found' })
+      return res.status(404).send({ Message: 'User not found' ,status:false,data:{}})
     }
      // Get the array of blocked user IDs
      const blockedUsers = currentUser.blockedUsers || [];
@@ -178,7 +178,7 @@ const getPostFeeds = async (req, res) => {
       .status(200)
       .send({ message: 'all post', status: true, data: postFeeds })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    return res.status(500).json({ error: err.message })
   }
 }
 
