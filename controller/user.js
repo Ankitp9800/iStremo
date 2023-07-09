@@ -54,7 +54,7 @@ const createUser = async (req, res) => {
     })
 
     await newUser.save()
-    res.status(201).send({ data: newUser, status: true })
+    return res.status(201).send({ data: newUser, status: true })
   } catch (err) {
     console.log(err)
     res.status(400).send({ error: err, status: false })
@@ -66,7 +66,7 @@ const getUserById = async (req, res) => {
     try {
       const user = await User.findById(req.params.id).lean();
       if (!user) {
-        return res.status(404).send({ error: "User not found" });
+        return res.status(404).send({ Message: "User not found", status:false,data:{});
       }
       const postCount = await Post.countDocuments({ user: req.params.id });
       const totalFollowers = user.followers ? user.followers.length : 0;
@@ -78,7 +78,7 @@ const getUserById = async (req, res) => {
       });
     } catch (err) {
       console.error(err);
-      res.status(500).send({ error: "Internal server error" });
+      return res.status(500).send({ error: "Internal server error" });
     }
   }
   
@@ -89,9 +89,9 @@ const updateUserById = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     })
-    res.send(updatedUser)
+    return res.status(200).send({data:updatedUser,status:true,message:"updated successfully.})
   } catch (err) {
-    res.status(404).send({ error: 'User not found' })
+    res.status(404).send({ error: err.message })
   }
 }
 
@@ -99,9 +99,9 @@ const updateUserById = async (req, res) => {
 const deleteUserById = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id)
-    res.sendStatus(204)
+    return res.sendStatus(204)
   } catch (err) {
-    res.status(404).send({ error: 'User not found' })
+    res.status(404).send({ error: err.message })
   }
 }
 const loginUser = async (req, res) => {
@@ -124,13 +124,13 @@ const loginUser = async (req, res) => {
     })
 
     // Return the token
-    res.status(200).send({
+   return res.status(200).send({
       message: 'login successfully.',
       status: true,
       data: { ...user, Auth: token },
     })
   } catch (err) {
-    res.status(500).send({ error: err })
+    return res.status(500).send({ error: err.message })
   }
 }
 
@@ -156,7 +156,7 @@ const followUser = async (req, res) => {
       followUser.followers.push(userId);
       await Promise.all([user.save(), followUser.save()]);
   
-      res.json({ message: 'User followed successfully' });
+      return res.json({ message: 'User followed successfully' });
     } catch (err) {
       res.status(500).json({ error: 'Internal server error' });
     }
@@ -249,13 +249,13 @@ const getPostCount = async (req, res) => {
       // Find the user
       const user = await User.findById(userId);
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ Message: 'User not found', status:false,data:{});
       }
       // Count the posts for the user
       const postCount = await Post.countDocuments({ user: userId });
-      res.status(200).send({ message:"total postcount",status:true,postCount });
+      return res.status(200).send({ message:"total postcount",status:true,postCount });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      return res.status(500).json({ error: err.message });
     }
   };
 module.exports = {
