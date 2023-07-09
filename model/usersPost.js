@@ -52,7 +52,11 @@ const postSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'User'
     }
-  }]
+  }],
+   status:{
+    type:Boolean,
+    default:false
+  }
 });
 
 const Post = mongoose.model('Post', postSchema);
