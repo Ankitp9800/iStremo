@@ -9,7 +9,7 @@ const createPost = async (req, res) => {
     // Check if the user exists
     const user = await User.findById(userId)
     if (!user) {
-      return res.status(404).send({ error: 'User not found' })
+       return res.status(404).send({ Message: 'Post not found',status:false,data:{} })
     }
 
     const newPost = await Post.create({
