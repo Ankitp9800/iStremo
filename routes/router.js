@@ -21,6 +21,7 @@ router.delete('/posts/:id', postController.deletePostById);
 router.post('/posts/like', postController.likePost);
 router.get('/posts/:postId/likes', postController.getPostLikes); 
 router.get('/posts/feeds/:userId', postController.getPostFeeds); 
+router.get('/posts/liked/:userId',postController.getLikedPosts);
 
 
 
