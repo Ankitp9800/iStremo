@@ -66,7 +66,7 @@ const getUserById = async (req, res) => {
     try {
       const user = await User.findById(req.params.id).lean();
       if (!user) {
-        return res.status(404).send({ Message: "User not found", status:false,data:{});
+        return res.status(404).send({ Message: "User not found", status:false,data:{}});
       }
       const postCount = await Post.countDocuments({ user: req.params.id });
       const totalFollowers = user.followers ? user.followers.length : 0;
