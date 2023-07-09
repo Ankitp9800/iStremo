@@ -1,16 +1,18 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 const bcrypt = require('bcrypt')
-const autoIncrement = require('mongoose-auto-increment');
+// const autoIncrement = require('mongoose-auto-increment');
 
 const userSchema = new Schema({
   name: {
     type: String,
-    required: true,
+    required: true, 
+    default:""
   },
   user_id: {
     type: Number,
-    default: null
+    default: null,
+    default:""
     // required: true,
   },
   password: {
@@ -24,20 +26,24 @@ const userSchema = new Schema({
     unique: true,
     required: true,
     match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    default:""
   },
   user_name: {
     type: String,
     unique: true,
     required: true,
+    default:""
   },
   gender: {
     type: String,
     enum: ['male', 'female', 'other'],
     required: true,
+    default:'other'
   },
   mobile: {
     type: String,
     required: true,
+    default:""
     // validate: {
     //   validator: function (value) {
     //     return /^\+\d{1,3}\s?\d{6,14}$/.test(value)
@@ -62,7 +68,7 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User'
   }],
-   status:{
+  status:{
     type:Boolean,
     default:false
   }
