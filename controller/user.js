@@ -1,8 +1,8 @@
-const User = require('../model/usermodel');
+const User = require('../model/usermodel')
 
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken');
-const Post = require('../model/usersPost');
+const jwt = require('jsonwebtoken')
+const Post = require('../model/usersPost')
 
 // CREATE operation
 const createUser = async (req, res) => {
@@ -63,25 +63,26 @@ const createUser = async (req, res) => {
 
 // READ operation
 const getUserById = async (req, res) => {
-    try {
-      const user = await User.findById(req.params.id).lean();
-      if (!user) {
-        return res.status(404).send({ Message: "User not found", status:false,data:{}});
-      }
-      const postCount = await Post.countDocuments({ user: req.params.id });
-      const totalFollowers = user.followers ? user.followers.length : 0;
-      const totalFollowing = user.following ? user.following.length : 0;
-      return res.status(200).send({
-        message: "User details",
-        status: true,
-        data: { ...user, totalFollowers, totalFollowing,postCount },
-      });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).send({ error: "Internal server error" });
+  try {
+    const user = await User.findById(req.params.id).lean()
+    if (!user) {
+      return res
+        .status(404)
+        .send({ Message: 'User not found', status: false, data: {} })
     }
+    const postCount = await Post.countDocuments({ user: req.params.id })
+    const totalFollowers = user.followers ? user.followers.length : 0
+    const totalFollowing = user.following ? user.following.length : 0
+    return res.status(200).send({
+      message: 'User details',
+      status: true,
+      data: { ...user, totalFollowers, totalFollowing, postCount },
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).send({ error: 'Internal server error' })
   }
-  
+}
 
 // UPDATE operation
 const updateUserById = async (req, res) => {
@@ -89,7 +90,13 @@ const updateUserById = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     })
-        return res.status(200).send({data:updatedUser,status:true,message:"updated successfully."});
+    return res
+      .status(200)
+      .send({
+        data: updatedUser,
+        status: true,
+        message: 'updated successfully.',
+      })
   } catch (err) {
     res.status(404).send({ error: err.message })
   }
@@ -124,7 +131,7 @@ const loginUser = async (req, res) => {
     })
 
     // Return the token
-   return res.status(200).send({
+    return res.status(200).send({
       message: 'login successfully.',
       status: true,
       data: { ...user, Auth: token },
@@ -136,128 +143,159 @@ const loginUser = async (req, res) => {
 
 // Follow a user
 const followUser = async (req, res) => {
-    try {
-      const { userId, followUserId } = req.body;
-  
-      // Check if both users exist
-      const user = await User.findById(userId);
-      const followUser = await User.findById(followUserId);
-      if (!user || !followUser) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-  
-      // Check if the user is already following the followUser
-      if (user.following.includes(followUserId)) {
-        return res.status(400).json({ error: 'User already followed' });
-      }
-  
-      // Add followUser to user's following and user to followUser's followers, then save both users
-      user.following.push(followUserId);
-      followUser.followers.push(userId);
-      await Promise.all([user.save(), followUser.save()]);
-  
-      return res.json({ message: 'User followed successfully' });
-    } catch (err) {
-      res.status(500).json({ error: 'Internal server error' });
+  try {
+    const { userId, followUserId } = req.body
+
+    // Check if both users exist
+    const user = await User.findById(userId)
+    const followUser = await User.findById(followUserId)
+    if (!user || !followUser) {
+      return res.status(404).json({ error: 'User not found' })
     }
-  };
+
+    // Check if the user is already following the followUser
+    if (user.following.includes(followUserId)) {
+      return res.status(400).json({ error: 'User already followed' })
+    }
+
+    // Add followUser to user's following and user to followUser's followers, then save both users
+    user.following.push(followUserId)
+    followUser.followers.push(userId)
+    await Promise.all([user.save(), followUser.save()])
+
+    return res.json({ message: 'User followed successfully' })
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
 
 // Unfollow a user
 const unfollowUser = async (req, res) => {
-    try {
-      const { userId, unfollowUserId } = req.body;
-  
-      // Check if both users exist
-      const user = await User.findById(userId);
-      const unfollowUser = await User.findById(unfollowUserId);
-      if (!user || !unfollowUser) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-  
-      // Check if the user is following the unfollowUser
-      if (!user.following.includes(unfollowUserId)) {
-        return res.status(400).json({ error: 'User is not being followed' });
-      }
-  
-      // Remove unfollowUser from user's following and user from unfollowUser's followers, then save both users
-      user.following = user.following.filter(id => id.toString() !== unfollowUserId);
-      unfollowUser.followers = unfollowUser.followers.filter(id => id.toString() !== userId);
-      await Promise.all([user.save(), unfollowUser.save()]);
-  
-      res.json({ message: 'User unfollowed successfully' });
-    } catch (err) {
-      res.status(500).json({ error: 'Internal server error' });
+  try {
+    const { userId, unfollowUserId } = req.body
+
+    // Check if both users exist
+    const user = await User.findById(userId)
+    const unfollowUser = await User.findById(unfollowUserId)
+    if (!user || !unfollowUser) {
+      return res.status(404).json({ error: 'User not found' })
     }
-  };
+
+    // Check if the user is following the unfollowUser
+    if (!user.following.includes(unfollowUserId)) {
+      return res.status(400).json({ error: 'User is not being followed' })
+    }
+
+    // Remove unfollowUser from user's following and user from unfollowUser's followers, then save both users
+    user.following = user.following.filter(
+      (id) => id.toString() !== unfollowUserId,
+    )
+    unfollowUser.followers = unfollowUser.followers.filter(
+      (id) => id.toString() !== userId,
+    )
+    await Promise.all([user.save(), unfollowUser.save()])
+
+    res.json({ message: 'User unfollowed successfully' })
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
 // Block a user
 const blockUser = async (req, res) => {
-    try {
-      const { userId, blockUserId } = req.body;
-  
-      // Check if both users exist
-      const user = await User.findById(userId);
-      const blockUser = await User.findById(blockUserId);
-      if (!user || !blockUser) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-  
-      // Check if the user is already blocked
-      if (user.blockedUsers.includes(blockUserId)) {
-        return res.status(400).json({ error: 'User already blocked' });
-      }
-  
-      // Add blockUser to user's blockedUsers and save
-      user.blockedUsers.push(blockUserId);
-      await user.save();
-  
-      res.json({ message: 'User blocked successfully' });
-    } catch (err) {
-      res.status(500).json({ error: 'Internal server error' });
+  try {
+    const { userId, blockUserId } = req.body
+
+    // Check if both users exist
+    const user = await User.findById(userId)
+    const blockUser = await User.findById(blockUserId)
+    if (!user || !blockUser) {
+      return res.status(404).json({ error: 'User not found' })
     }
-  };
-  
-  // Unblock a user
-  const unblockUser = async (req, res) => {
-    try {
-      const { userId, unblockUserId } = req.body;
-  
-      // Check if both users exist
-      const user = await User.findById(userId);
-      const unblockUser = await User.findById(unblockUserId);
-      if (!user || !unblockUser) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-  
-      // Check if the user is already not blocked
-      if (!user.blockedUsers.includes(unblockUserId)) {
-        return res.status(400).json({ error: 'User not blocked' });
-      }
-  
-      // Remove unblockUser from user's blockedUsers and save
-      user.blockedUsers = user.blockedUsers.filter(blockedUser => blockedUser.toString() !== unblockUserId);
-      await user.save();
-  
-      res.json({ message: 'User unblocked successfully' });
-    } catch (err) {
-      res.status(500).json({ error: 'Internal server error' });
+
+    // Check if the user is already blocked
+    if (user.blockedUsers.includes(blockUserId)) {
+      return res.status(400).json({ error: 'User already blocked' })
     }
-  };
-  // Get post count for a user
+
+    // Add blockUser to user's blockedUsers and save
+    user.blockedUsers.push(blockUserId)
+    await user.save()
+
+    res.json({ message: 'User blocked successfully' })
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
+// Unblock a user
+const unblockUser = async (req, res) => {
+  try {
+    const { userId, unblockUserId } = req.body
+
+    // Check if both users exist
+    const user = await User.findById(userId)
+    const unblockUser = await User.findById(unblockUserId)
+    if (!user || !unblockUser) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    // Check if the user is already not blocked
+    if (!user.blockedUsers.includes(unblockUserId)) {
+      return res.status(400).json({ error: 'User not blocked' })
+    }
+
+    // Remove unblockUser from user's blockedUsers and save
+    user.blockedUsers = user.blockedUsers.filter(
+      (blockedUser) => blockedUser.toString() !== unblockUserId,
+    )
+    await user.save()
+
+    res.json({ message: 'User unblocked successfully' })
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
+// Get post count for a user
 const getPostCount = async (req, res) => {
-    try {
-      const userId = req.params.userId;
-      // Find the user
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ Message: 'User not found', status:false,data:{}});
-      }
-      // Count the posts for the user
-      const postCount = await Post.countDocuments({ user: userId });
-      return res.status(200).send({ message:"total postcount",status:true,postCount });
-    } catch (err) {
-      return res.status(500).json({ error: err.message });
+  try {
+    const userId = req.params.userId;
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ Message: 'User not found', status: false, data: {} });
     }
-  };
+    // Find the posts by the user
+    const userPosts = await Post.find({ user: userId });
+    const postCount = userPosts.length;
+
+    // Get the follower count
+    const followerCount = user.followers.length;
+
+    // Get the following count
+    const followingCount = user.following.length;
+
+    // Get the list of users who liked the posts
+    const userIdsLikedPosts = userPosts.flatMap(post => post.likes.map(like => like.user));
+    const usersLikedPosts = await User.find({ _id: { $in: userIdsLikedPosts } }, 'name email_id user_id user_name');
+
+    return res.status(200).json({
+      message: 'Total post count',
+      status: true,
+      postCount,
+      followerCount,
+      followingCount,
+      usersLikedPosts
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+
+
+
+
 module.exports = {
   createUser,
   getUserById,
@@ -268,5 +306,5 @@ module.exports = {
   unfollowUser,
   blockUser,
   unblockUser,
-  getPostCount
+  getPostCount,
 }
