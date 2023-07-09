@@ -89,7 +89,7 @@ const updateUserById = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     })
-    return res.status(200).send({data:updatedUser,status:true,message:"updated successfully.})
+        return res.status(200).send({data:updatedUser,status:true,message:"updated successfully."});
   } catch (err) {
     res.status(404).send({ error: err.message })
   }
@@ -249,7 +249,7 @@ const getPostCount = async (req, res) => {
       // Find the user
       const user = await User.findById(userId);
       if (!user) {
-        return res.status(404).json({ Message: 'User not found', status:false,data:{});
+        return res.status(404).json({ Message: 'User not found', status:false,data:{}});
       }
       // Count the posts for the user
       const postCount = await Post.countDocuments({ user: userId });
