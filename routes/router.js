@@ -2,6 +2,8 @@ const router = require("express").Router();
 
 const Users = require("../controller/user");
 const postController = require("../controller/posts");
+const upload = require('../middleware/image'); // Import the multer middleware
+
 
 router.post("/register",Users.createUser);
 router.get("/user/:id",Users.getUserById);
@@ -14,7 +16,7 @@ router.post('/users/unblock', Users.unblockUser);
 router.get('/users/:userId/posts/count', Users.getPostCount); 
 
 // Post Routes
-router.post('/posts', postController.createPost);
+router.post('/posts',upload.single('media'), postController.createPost);
 router.get('/posts/:id', postController.getPostById);
 router.put('/posts/:id', postController.updatePostById);
 router.delete('/posts/:id', postController.deletePostById);
