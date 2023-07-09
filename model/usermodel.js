@@ -61,7 +61,11 @@ const userSchema = new Schema({
   blockedUsers: [{
     type: Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
+   status:{
+    type:Boolean,
+    default:false
+  }
 })
 
 // userSchema.plugin(autoIncrement, { model: 'User', field: 'user_id' })
