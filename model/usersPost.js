@@ -9,10 +9,12 @@ const postSchema = new Schema({
   },
   text: {
     type: String,
-    required: true
+    required: true,
+    default:""
   },
   media: {
-    type: String
+    type: String,
+    default:""
   },
   public: {
     type: Boolean,
@@ -53,7 +55,7 @@ const postSchema = new Schema({
       ref: 'User'
     }
   }],
-   status:{
+  status:{
     type:Boolean,
     default:false
   }
