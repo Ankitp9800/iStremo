@@ -5,7 +5,7 @@ const User = require('../model/usermodel')
 // CREATE operation
 const createPost = async (req, res) => {
   try {
-    const { userId, text, media, public, hashtags, friendTags } = req.body
+    const { userId, text, public, hashtags, friendTags } = req.body
 
     // Check if the user exists
     const user = await User.findById(userId)
@@ -14,11 +14,11 @@ const createPost = async (req, res) => {
         .status(404)
         .send({ Message: 'User not found', status: false, data: {} })
     }
-
+    const { filename } = req.file;
     const newPost = await Post.create({
       user: userId,
       text,
-      media,
+      media:`http://localhost:8080/assets/${filename}`,
       public,
       hashtags,
       friendTags,
