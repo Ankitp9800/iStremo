@@ -24,6 +24,6 @@ jobs:
                cd /home/ubuntu/iStremo
                git pull origin main
                npm install
-               pm2 restart iStremo
+               pm2 restart iStremo_8080
 
 
